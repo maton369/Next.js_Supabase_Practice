@@ -1,13 +1,17 @@
-// app/api/items/readsingle/[id]/route.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import supabase from "@/app/utils/database";
 
-export async function GET(
-  _req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const id = url.pathname.split("/").pop();
+
+  if (!id) {
+    return NextResponse.json(
+      { message: "IDがURLに含まれていません。" },
+      { status: 400 }
+    );
+  }
 
   try {
     const { data, error } = await supabase
@@ -16,7 +20,7 @@ export async function GET(
       .eq("id", id)
       .single();
 
-    if (error) {
+    if (error || !data) {
       console.error("データ取得エラー:", error);
       return NextResponse.json(
         { message: "データ取得失敗", error },

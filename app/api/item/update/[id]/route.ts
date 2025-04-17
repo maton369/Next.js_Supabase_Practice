@@ -1,17 +1,26 @@
+// app/api/item/update/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import supabase from "@/app/utils/database";
 
 const SECRET_KEY = new TextEncoder().encode("next-market-route-handlers");
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+export async function PUT(request: NextRequest) {
+  // URL から ID 抽出
+  const url = new URL(request.url);
+  const id = url.pathname.split("/").pop();
 
+  if (!id) {
+    return NextResponse.json(
+      { message: "IDが指定されていません" },
+      { status: 400 }
+    );
+  }
+
+  // トークン確認
   const authHeader = request.headers.get("Authorization");
   const token = authHeader?.split(" ")[1];
+
   if (!token) {
     return NextResponse.json(
       { message: "トークンがありません" },
@@ -23,7 +32,7 @@ export async function PUT(
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
     email = payload.email as string;
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       { message: "トークンが無効です" },
       { status: 401 }
@@ -32,8 +41,8 @@ export async function PUT(
 
   let body;
   try {
-    body = await request.json(); // JSON形式エラー対策含む
-  } catch (err) {
+    body = await request.json();
+  } catch {
     return NextResponse.json(
       { message: "リクエスト形式が不正です" },
       { status: 400 }

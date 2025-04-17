@@ -5,11 +5,17 @@ import supabase from "@/app/utils/database";
 
 const SECRET_KEY = new TextEncoder().encode("next-market-route-handlers");
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const id = context.params.id;
+export async function DELETE(request: NextRequest) {
+  const url = new URL(request.url);
+  const id = url.pathname.split("/").pop();
+
+  if (!id) {
+    return NextResponse.json(
+      { message: "IDがURLに含まれていません。" },
+      { status: 400 }
+    );
+  }
+
   const authHeader = request.headers.get("Authorization");
   const token = authHeader?.split(" ")[1];
 
@@ -24,7 +30,7 @@ export async function DELETE(
 
   try {
     const { payload } = await jwtVerify(token, SECRET_KEY);
-    userEmail = payload.email as string;
+    userEmail = (payload as any).email;
   } catch (error) {
     return NextResponse.json(
       { message: "トークンが無効です。再ログインしてください。" },

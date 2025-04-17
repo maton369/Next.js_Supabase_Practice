@@ -1,39 +1,82 @@
-// app/api/item/[id]/route.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 import supabase from "@/app/utils/database";
 
+const SECRET_KEY = new TextEncoder().encode("next-market-route-handlers");
+
 export async function PUT(
-  req: NextRequest,
+  request: NextRequest,
   context: { params: { id: string } }
 ) {
   const { id } = context.params;
-  const body = await req.json();
+
+  const authHeader = request.headers.get("Authorization");
+  const token = authHeader?.split(" ")[1];
+  if (!token) {
+    return NextResponse.json(
+      { message: "トークンがありません" },
+      { status: 401 }
+    );
+  }
+
+  let email = "";
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY);
+    email = payload.email as string;
+  } catch (err) {
+    return NextResponse.json(
+      { message: "トークンが無効です" },
+      { status: 401 }
+    );
+  }
+
+  let body;
+  try {
+    body = await request.json(); // JSON形式エラー対策含む
+  } catch (err) {
+    return NextResponse.json(
+      { message: "リクエスト形式が不正です" },
+      { status: 400 }
+    );
+  }
 
   try {
-    const { data, error } = await supabase
+    const { data: item, error: fetchError } = await supabase
       .from("items")
-      .update(body)
+      .select("email")
       .eq("id", id)
-      .select()
       .single();
 
-    if (error) {
-      console.error("データ更新エラー:", error);
+    if (fetchError || !item) {
       return NextResponse.json(
-        { message: "アイテム更新失敗", error },
-        { status: 400 }
+        { message: "アイテムが見つかりません" },
+        { status: 404 }
       );
     }
 
-    return NextResponse.json({
-      message: "アイテム更新成功",
-      item: data,
-    });
-  } catch (e) {
-    console.error("例外発生:", e);
+    if (item.email !== email) {
+      return NextResponse.json(
+        { message: "他の人のアイテムは編集できません" },
+        { status: 403 }
+      );
+    }
+
+    const { error: updateError } = await supabase
+      .from("items")
+      .update(body)
+      .eq("id", id);
+
+    if (updateError) {
+      return NextResponse.json(
+        { message: "更新に失敗しました", error: updateError },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ message: "アイテムを更新しました" });
+  } catch (err) {
     return NextResponse.json(
-      { message: "予期せぬエラーで失敗しました" },
+      { message: `更新処理失敗: ${err}` },
       { status: 500 }
     );
   }

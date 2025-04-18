@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import supabase from "@/app/utils/database";
 
-// 簡易メール形式チェック（正規表現）
+// メール形式チェック関数
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       id: signUpData.user.id,
       name,
       email,
+      password, // パスワードも保存（開発用）
     });
 
     if (insertError) {

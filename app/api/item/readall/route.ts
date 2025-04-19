@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       message: "アイテム読み取り成功（オール）",
-      items: data,
+      allItems: data,
     });
   } catch (e) {
     console.error("例外発生:", e);

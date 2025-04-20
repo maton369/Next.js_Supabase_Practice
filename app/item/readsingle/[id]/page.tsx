@@ -10,6 +10,13 @@ interface Item {
   description: string;
 }
 
+// ページ引数型定義
+interface ReadSingleItemProps {
+  params: {
+    id: string;
+  };
+}
+
 // 環境変数からベースURLを取得
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
@@ -28,7 +35,7 @@ const getSingleItem = async (id: string): Promise<Item | null> => {
 };
 
 // ページコンポーネント
-const ReadSingleItem = async ({ params }: { params: { id: string } }) => {
+const ReadSingleItem = async ({ params }: ReadSingleItemProps) => {
   const singleItem = await getSingleItem(params.id);
 
   if (!singleItem) {

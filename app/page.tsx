@@ -12,9 +12,12 @@ interface Item {
   description: string;
 }
 
+// 環境変数からベースURLを取得
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
+
 // APIからアイテム一覧を取得
 const getAllItems = async (): Promise<Item[]> => {
-  const response = await fetch("http://localhost:3000/api/item/readall", {
+  const response = await fetch(`${BASE_URL}/api/item/readall`, {
     cache: "no-store",
   });
   const jsonData = await response.json();

@@ -25,8 +25,8 @@ const getSingleItem = async (id: string): Promise<Item | null> => {
   }
 };
 
-// ページコンポーネント（修正済）
-const ReadSingleItem = async ({ params }: { params: { id: string } }) => {
+// ✅ ページコンポーネント（params 型を any に一時対応）
+const ReadSingleItem = async ({ params }: any) => {
   const singleItem = await getSingleItem(params.id);
 
   if (!singleItem) {

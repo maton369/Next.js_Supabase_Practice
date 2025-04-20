@@ -10,6 +10,13 @@ interface Item {
   description: string;
 }
 
+// props の型定義
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
 // データ取得関数
 const getSingleItem = async (id: string): Promise<Item | null> => {
   try {
@@ -26,7 +33,7 @@ const getSingleItem = async (id: string): Promise<Item | null> => {
 };
 
 // ページコンポーネント
-const ReadSingleItem = async ({ params }: { params: { id: string } }) => {
+const ReadSingleItem = async ({ params }: PageProps) => {
   const singleItem = await getSingleItem(params.id);
 
   if (!singleItem) {

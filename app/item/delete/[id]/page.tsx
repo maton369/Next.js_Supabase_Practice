@@ -5,6 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import useAuth from "@/app/utils/useAuth";
 
+// 環境変数からAPIのベースURLを取得
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
+
 interface Item {
   title: string;
   price: string;
@@ -31,7 +34,7 @@ const DeleteItem = () => {
     const getSingleItem = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/item/readsingle/${itemId}`
+          `${BASE_URL}/api/item/readsingle/${itemId}`
         );
         const jsonData = await response.json();
         const singleItem = jsonData.item;
@@ -60,18 +63,15 @@ const DeleteItem = () => {
         return;
       }
 
-      const response = await fetch(
-        `http://localhost:3000/api/item/delete/${itemId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ email: loginUserEmail }),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/item/delete/${itemId}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: loginUserEmail }),
+      });
 
       const jsonData = await response.json();
       alert(jsonData.message);

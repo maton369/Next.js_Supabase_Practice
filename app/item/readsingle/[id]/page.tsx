@@ -10,13 +10,15 @@ interface Item {
   description: string;
 }
 
+// 環境変数からベースURLを取得
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
+
 // データ取得関数
 const getSingleItem = async (id: string): Promise<Item | null> => {
   try {
-    const response = await fetch(
-      `http://localhost:3000/api/item/readsingle/${id}`,
-      { cache: "no-store" }
-    );
+    const response = await fetch(`${BASE_URL}/api/item/readsingle/${id}`, {
+      cache: "no-store",
+    });
     const jsonData = await response.json();
     return jsonData.item ?? null;
   } catch (err) {
@@ -25,8 +27,8 @@ const getSingleItem = async (id: string): Promise<Item | null> => {
   }
 };
 
-// ✅ ページコンポーネント（params 型を any に一時対応）
-const ReadSingleItem = async ({ params }: any) => {
+// ページコンポーネント
+const ReadSingleItem = async ({ params }: { params: { id: string } }) => {
   const singleItem = await getSingleItem(params.id);
 
   if (!singleItem) {

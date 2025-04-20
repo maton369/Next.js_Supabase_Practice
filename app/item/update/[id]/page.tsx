@@ -12,6 +12,8 @@ interface Item {
   email: string;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
+
 const UpdateItem = () => {
   const [item, setItem] = useState<Item>({
     title: "",
@@ -30,7 +32,7 @@ const UpdateItem = () => {
     const getSingleItem = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/item/readsingle/${itemId}`
+          `${BASE_URL}/api/item/readsingle/${itemId}`
         );
         const jsonData = await response.json();
         const singleItem = jsonData.item;
@@ -59,24 +61,21 @@ const UpdateItem = () => {
         return;
       }
 
-      const response = await fetch(
-        `http://localhost:3000/api/item/update/${itemId}`,
-        {
-          method: "PUT",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: item.title,
-            price: item.price,
-            image: item.image.trim(),
-            description: item.description,
-            email: loginUserEmail,
-          }),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/item/update/${itemId}`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: item.title,
+          price: item.price,
+          image: item.image.trim(),
+          description: item.description,
+          email: loginUserEmail,
+        }),
+      });
 
       const jsonData = await response.json();
       alert(jsonData.message);

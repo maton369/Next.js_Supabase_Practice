@@ -4,6 +4,9 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/app/utils/useAuth";
 
+// APIのベースURL（環境変数から取得）
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL as string;
+
 const CreateItem = () => {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -24,7 +27,7 @@ const CreateItem = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:3000/api/item/create", {
+      const response = await fetch(`${BASE_URL}/api/item/create`, {
         method: "POST",
         headers: {
           Accept: "application/json",

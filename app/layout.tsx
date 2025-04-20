@@ -1,15 +1,21 @@
-// app/layout.tsx
 import "./globals.css";
-import type { ReactNode } from "react";
+import Header from "./components/header";
+import Footer from "./components/footer";
+import type { Metadata } from "next";
 
-interface RootLayoutProps {
-  children: ReactNode;
-}
+export const metadata: Metadata = {
+  title: "Next Market",
+  description: "Supabase と連携した Next.js マーケットアプリ",
+};
 
-const RootLayout = ({ children }: RootLayoutProps) => {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="ja">
+      <body>
+        <Header />
+        <main>{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 };
